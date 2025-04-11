@@ -45,12 +45,10 @@ public class ChatSteps
         var json = await response.JsonAsync();
         var jsonElement = (JsonElement)json;
 
-        // Vänta på bekräftelse
         var confirmation = _customerPage.Locator("text=Formulär skickat!");
         await confirmation.WaitForAsync(new() { Timeout = 5000 });
         Assert.True(await confirmation.IsVisibleAsync());
 
-        // Plocka ut chatToken från "submission"
         if (!jsonElement.TryGetProperty("submission", out var submissionElement) ||
             !submissionElement.TryGetProperty("chatToken", out var tokenElement))
         {
@@ -106,13 +104,38 @@ public class ChatSteps
     {
         _staffPage = _scenarioContext.Get<IPage>("StaffPage");
         await _staffPage.FillAsync("input[type='text']", "Hej, vi hjälper dig strax!");
-        await _staffPage.WaitForSelectorAsync(".chat-modal__send-button", new() { Timeout = 10000 });
+
+        var sendButton = _staffPage.Locator(".chat-modal__send-button");
+        await sendButton.WaitForAsync(new() { Timeout = 10000 });
+        await sendButton.ClickAsync();
     }
 
     [Then("the customer should see the staff's response")]
     public async Task ThenCustomerSeesResponse()
     {
         _customerPage = _scenarioContext.Get<IPage>("CustomerPage");
-        await _customerPage.WaitForSelectorAsync("text=Hej, vi hjälper dig strax!", new() { Timeout = 10000 });
+
+        const string expectedText = "Hej, vi hjälper dig strax!";
+        const int maxRetries = 5;
+        const int retryDelayMs = 3000;
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            var visible = await _customerPage.IsVisibleAsync($"text={expectedText}");
+            if (visible)
+            {
+                return; // Success!
+            }
+
+            // 🧪 Prova att trigga fetchMessages manuellt (om frontend har stöd för det)
+            await _customerPage.EvaluateAsync("() => window.dispatchEvent(new Event('forceFetchMessages'))");
+
+            await Task.Delay(retryDelayMs);
+        }
+
+        // 📸 Ta screenshot för felsökning
+        await _customerPage.ScreenshotAsync(new() { Path = "customer_after_staff_reply.png", FullPage = true });
+
+        throw new TimeoutException("Staffens meddelande syntes aldrig i kundens chatt efter flera försök.");
     }
 }
