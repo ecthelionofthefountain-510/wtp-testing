@@ -20,6 +20,11 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Visa innehåll i tmp-mappen
+        run: |
+          ls -la tmp
+          cat tmp/cookies.json
+
       - name: Install Newman
         run: npm install -g newman
 
