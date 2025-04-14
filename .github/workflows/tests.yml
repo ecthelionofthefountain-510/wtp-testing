@@ -26,7 +26,8 @@ jobs:
       - name: Create tmp folder and valid empty cookie file
         run: |
           mkdir -p tmp
-          printf "{}" > tmp/cookies.json
+          printf '{}' > tmp/cookies.json
+          cat tmp/cookies.json
 
       - name: Run API-Tests (Postman)
         run: |
