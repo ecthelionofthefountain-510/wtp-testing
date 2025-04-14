@@ -23,6 +23,14 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
+      - name: Start API server
+        run: |
+          cd WTP-main
+          nohup dotnet run > output.log 2>&1 &
+
+      - name: Wait for API to be ready
+        run: sleep 10
+
       - name: Run API-Tests (Postman)
         run: newman run ./Postman/Wtp.postman_collection.json -e ./Postman/Wtp.postman_environment.json
 
