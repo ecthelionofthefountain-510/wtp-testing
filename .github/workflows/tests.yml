@@ -42,7 +42,8 @@ api_tests:
           -e ./Postman/Wtp.postman_environment.json \
           --cookie-jar ./tmp/cookies.json \
           --bail
-
+ 
+          
   gui_tests:
     runs-on: ubuntu-latest
     needs: api_tests
