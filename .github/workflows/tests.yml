@@ -1,33 +1,42 @@
-name: Run SpecFlow Playwright Tests
+name: Run E2E Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
+    env:
+      CI: true # Gör det möjligt att upptäcka headless-läge i C#
+    
     steps:
-      - name: 🛎️ Check out repository
+      - name: 🧾 Check out repo
         uses: actions/checkout@v3
 
-      - name: 🛠 Setup .NET SDK
+      - name: ⚙️ Set up .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: 📦 Install npm and Playwright
+      - name: 📦 Install dependencies
+        run: dotnet restore E2ETesting-main/E2ETesting.csproj
+
+      - name: 🛠️ Build project
+        run: dotnet build --no-restore E2ETesting-main/E2ETesting.csproj
+
+      - name: 🔍 Run tests
         run: |
-          npm install -g playwright
-          npx playwright install --with-deps
-
-      - name: 📦 Restore NuGet packages
-        run: dotnet restore ./E2ETesting-main/E2ETesting.csproj
-
-      - name: 🔨 Build project
-        run: dotnet build ./E2ETesting-main/E2ETesting.csproj --configuration Debug
-
-      - name: 🚀 Run Playwright tests
-        run: dotnet test ./E2ETesting-main/E2ETesting.csproj --logger "trx"
+          dotnet test E2ETesting-main/E2ETesting.csproj \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory "TestResults" \
+            --no-build
+          
+      - name: 📤 Upload test report (.trx)
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: E2ETesting-main/TestResults/test-results.trx
