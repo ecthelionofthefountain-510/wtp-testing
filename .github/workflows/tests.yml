@@ -77,5 +77,5 @@ jobs:
   #         password: ${{ secrets.PASSWORD }}
   #         port: ${{ secrets.PORT }}
   #         script: |
-  #           cd /srv/www/<stad>/<studentnamn>/projektnamn
+  #           cd /srv/www/malmo/kevin/
   #           git pull
