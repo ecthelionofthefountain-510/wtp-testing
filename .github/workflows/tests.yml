@@ -20,21 +20,21 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore backend dependencies
-        run: dotnet restore ./WTP-main/server/server.csproj
-
-      - name: Start backend server
-        run: |
-          nohup dotnet run --project ./WTP-main/server/server.csproj > output.log 2>&1 &
-
-      - name: Wait for backend to start
-        run: sleep 10
-
       - name: Install Newman
         run: npm install -g newman
 
+      - name: Create tmp directory for cookie jar
+        run: mkdir -p ./tmp
+
+      - name: Start backend server
+        working-directory: ./WTP-main/server
+        run: nohup dotnet run --urls=http://localhost:5000 > ../../tmp/server.log 2>&1 &
+
+      - name: Wait for server to start
+        run: sleep 5
+
       - name: Run API-Tests (Postman)
-        run: newman run ./Postman/Wtp.postman_collection.json -e ./Postman/Wtp.postman_environment.json --cookie-jar ./cookies.json
+        run: newman run ./Postman/Wtp.postman_collection.json -e ./Postman/Wtp.postman_environment.json --cookie-jar ./tmp/cookies.json
 
   gui_tests:
     runs-on: ubuntu-latest
@@ -47,30 +47,14 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore GUI test dependencies
+      - name: Install dotnet project dependencies
         run: dotnet restore ./E2ETesting-main/E2ETesting.csproj
 
-      - name: Build GUI test project
+      - name: Build E2E Test Project
         run: dotnet build ./E2ETesting-main/E2ETesting.csproj
 
-      - name: Install Playwright browsers
+      - name: Install Playwright Browsers
         run: pwsh ./E2ETesting-main/bin/Debug/net8.0/playwright.ps1 install --with-deps
 
       - name: Run Playwright GUI Tests
         run: dotnet test ./E2ETesting-main/E2ETesting.csproj
-
-  # deploy:
-  #   name: Deploy to Server
-  #   runs-on: ubuntu-latest
-  #   needs: [api_tests, gui_tests]
-  #   steps:
-  #     - name: Deploy App
-  #       uses: appleboy/ssh-action@v1.2.0
-  #       with:
-  #         host: ${{ secrets.HOST }}
-  #         username: ${{ secrets.USERNAME }}
-  #         password: ${{ secrets.PASSWORD }}
-  #         port: ${{ secrets.PORT }}
-  #         script: |
-  #           cd /srv/www/malmo/kevin/
-  #           git pull
