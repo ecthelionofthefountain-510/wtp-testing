@@ -23,11 +23,20 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Start API server
+      - name: Restore backend dependencies
+        run: dotnet restore ./server
+
+      - name: Start API server in background
         run: nohup dotnet run --project ./server > output.log 2>&1 &
 
       - name: Wait for API to be ready
-        run: sleep 10
+        run: |
+          echo "Waiting for localhost:3001..."
+          for i in {1..30}; do
+            nc -z localhost 3001 && echo "API is up!" && exit 0
+            sleep 1
+          done
+          echo "API did not start in time." && exit 1
 
       - name: Run API-Tests (Postman)
         run: newman run ./Postman/Wtp.postman_collection.json -e ./Postman/Wtp.postman_environment.json
