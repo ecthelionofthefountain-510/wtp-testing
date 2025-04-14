@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Setup .NET
+      - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
@@ -23,8 +23,10 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Create tmp folder for cookies
-        run: mkdir -p tmp
+      - name: Create tmp folder and empty cookie file
+        run: |
+          mkdir -p tmp
+          touch tmp/cookies.json
 
       - name: Run API-Tests (Postman)
         run: |
@@ -39,12 +41,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Install dependencies
+      - name: Install dotnet project dependencies
         run: dotnet restore ./E2ETesting-main/E2ETesting.csproj
 
       - name: Build E2E Test Project
@@ -53,5 +55,5 @@ jobs:
       - name: Install Playwright Browsers
         run: pwsh ./E2ETesting-main/bin/Debug/net8.0/playwright.ps1 install --with-deps
 
-      - name: Run GUI-tests
+      - name: Run Playwright GUI Tests
         run: dotnet test ./E2ETesting-main/E2ETesting.csproj
