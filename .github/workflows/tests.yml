@@ -24,9 +24,7 @@ jobs:
         run: npm install -g newman
 
       - name: Start API server
-        run: |
-          cd WTP-main
-          nohup dotnet run > output.log 2>&1 &
+        run: nohup dotnet run --project ./server > output.log 2>&1 &
 
       - name: Wait for API to be ready
         run: sleep 10
