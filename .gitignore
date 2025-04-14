@@ -2,3 +2,6 @@ bin/
 obj/
 .playwright/
 WTP-main/
+
+# Ignore Playwright auto-generated .github folders in subdirs
+E2ETesting-main/.github/
