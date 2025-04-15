@@ -33,7 +33,6 @@ jobs:
         run: |
           newman run ./Postman/Wtp.postman_collection.json \
             -e ./Postman/Wtp.postman_environment.json \
-            --cookie-jar ./tmp/cookies.json \
             --bail
 
   gui_tests:
