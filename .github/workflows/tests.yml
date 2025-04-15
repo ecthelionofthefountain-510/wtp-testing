@@ -41,11 +41,11 @@ jobs:
 
     - name: ♻️ Återställ databas från dump
       run: |
-        psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
+        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
 
     - name: 🌱 Seed admin-användare
       run: |
-        psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
+        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
     - name: 🚀 Kör Postman-tester
       run: |
