@@ -214,7 +214,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\": \"KevinAdmin\",\n  \"password\": \"abc123\"\n}",
+							"raw": "{\n  \"username\": \"kevin.admin@gmail.com\",\n  \"password\": \"abc123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
