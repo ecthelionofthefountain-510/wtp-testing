@@ -9,7 +9,16 @@ namespace server;
 
 public class LoginRequest
 {
-   
+    public LoginRequest(string username, string password)
+    {
+        Username = username;
+        Password = password;
+    }
+
+    public string Username { get; set; }
+    public string Password { get; set; }
+}
+
 public class Program // Deklarerar huvudklassen Program
 {
     public static void Main(string[] args) // Deklarerar huvudmetoden Main
@@ -162,7 +171,9 @@ public class Program // Deklarerar huvudklassen Program
             }
         });
         
-        /*// Lägger till användare i databasen
+        
+        
+        // Lägger till användare i databasen
         app.MapPost("/api/users", async (UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
         {
             try
@@ -224,78 +235,29 @@ public class Program // Deklarerar huvudklassen Program
                     error = ex.Message
                 });
             }
-        });*/
-        
-
-    app.MapPost("/api/users", async (HttpContext context, UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
-{
-    // ✅ Kontrollera om användaren är inloggad
-    var isLoggedIn = context.Session.GetString("userId") != null;
-    if (!isLoggedIn)
-    {
-        Console.WriteLine("Försök att skapa användare utan att vara inloggad.");
-        return Results.Unauthorized();
-    }
-
-    try
-    {
-        // Bestäm role_id baserat på roll-strängen
-        int roleId = user.Role?.ToLower() switch
-        {
-            "super-admin" => 3,
-            "admin" => 2,
-            "staff" => 1,
-            _ => 1
-        };
-
-        user.CreatedAt = DateTime.UtcNow;
-
-        await using var cmd = db.CreateCommand(@"
-            INSERT INTO users (first_name, password, company, created_at, role_id, email)
-            VALUES (@first_name, @password, @company, @created_at, @role_id, @email)
-            RETURNING ""Id"", first_name, company, created_at;");
-
-        cmd.Parameters.AddWithValue("first_name", user.FirstName);
-        cmd.Parameters.AddWithValue("password", user.Password);
-        cmd.Parameters.AddWithValue("company", user.Company);
-        cmd.Parameters.AddWithValue("created_at", user.CreatedAt);
-        cmd.Parameters.AddWithValue("role_id", roleId);
-        cmd.Parameters.AddWithValue("email", user.Email);
-
-        await using var reader = await cmd.ExecuteReaderAsync();
-
-        if (await reader.ReadAsync())
-        {
-            await emailService.SendChangePasswordLink(
-                user.Email,
-                user.FirstName,
-                user.Password
-            );
-
-            return Results.Ok(new
-            {
-                message = "Användare skapad",
-                user = new
-                {
-                    Id = reader.GetInt32(0),
-                    FirstName = reader.GetString(1),
-                    Company = reader.GetString(2),
-                    CreatedAt = reader.GetDateTime(3)
-                }
-            });
-        }
-
-        return Results.BadRequest(new { message = "Kunde inte skapa användare" });
-    }
-    catch (Exception ex)
-    {
-        return Results.BadRequest(new
-        {
-            message = "Användare kunde inte skapas",
-            error = ex.Message
         });
-    }
-});
+
+        app.MapGet("/api/users", async (NpgsqlDataSource db) => // Mappar GET-begäran för att hämta alla användare
+        {
+            List<UserForm> users = new(); // Skapar en lista för att lagra användare
+            
+            await using var cmd = db.CreateCommand("SELECT users.\"Id\" as \"id\", users.first_name, users.company, users.role_id, users.email FROM users\n"); // Skapar en SQL-fråga för att hämta användare
+            var reader = await cmd.ExecuteReaderAsync(); // Utför SQL-frågan och läser resultatet
+            
+            while (await reader.ReadAsync()) // Loopar igenom varje rad i resultatet
+            {
+                users.Add(new UserForm // Lägger till en ny användare i listan
+                {
+                    Id = reader.GetInt32(0), // Hämtar ID från resultatet
+                    FirstName = reader.GetString(1), // Hämtar förnamn från resultatet
+                    Company = reader.GetString(2), // Hämtar företag från resultatet
+                    Role = reader.GetInt32(3) == 1 ? "staff" : "admin",
+                    Email = reader.GetString(4)
+                });
+            }
+            
+            return Results.Ok(users); // Returnerar ett OK-resultat med användarna
+        });
         
         app.MapDelete("/api/users/{userId}", async (int userId, NpgsqlDataSource db) =>
         {
@@ -368,6 +330,8 @@ public class Program // Deklarerar huvudklassen Program
                 return Results.BadRequest(new { message = ex.Message });
             }
         });
+
+        
         
         // Fordon Form Endpoints
         app.MapPost("/api/fordon", async (FordonForm submission, NpgsqlDataSource db, IEmailService emailService, IConfiguration config, ILogger<Program> logger) =>
@@ -669,7 +633,7 @@ public class Program // Deklarerar huvudklassen Program
             }
         };
         
-        // Logga in användare
+        
         app.MapPost("/api/login", async (HttpContext context, LoginRequest loginRequest, NpgsqlDataSource db) =>
         {
             try
@@ -737,9 +701,7 @@ public class Program // Deklarerar huvudklassen Program
                 return Results.BadRequest(new { message = "Inloggningen misslyckades", error = ex.Message });
             }
         });
-       
-        
-        // Kontrollera om användaren är inloggad
+
         app.MapGet("/api/chat/auth-status", (HttpContext context) =>
         {
             var userId = context.Session.GetString("userId");
@@ -755,8 +717,6 @@ public class Program // Deklarerar huvudklassen Program
             });
         });
 
-        
-        // logga ut användare
         app.MapPost("/api/logout", (HttpContext context) =>
         {
             try
@@ -781,8 +741,8 @@ public class Program // Deklarerar huvudklassen Program
             }
         });
 
-        
-       // arkivera tickets
+              
+
         app.MapPost("/api/tickets/archive", async (HttpContext httpContext, NpgsqlDataSource db) =>
         {
             try
@@ -893,13 +853,4 @@ public class Program // Deklarerar huvudklassen Program
         string IssueType,
         string Email,
         string FormType);
-}
-/*public LoginRequest(string username, string password)
-{
-    Username = username;
-    Password = password;
-}*/
-
-public string Username { get; set; }
-public string Password { get; set; }
 }
