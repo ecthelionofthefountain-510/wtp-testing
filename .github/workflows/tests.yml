@@ -1,13 +1,13 @@
-name: Run Postman + Playwright tests
+name: Kör E2E Tester
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  run-tests:
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -27,55 +27,40 @@ jobs:
 
     env:
       DOTNET_ROOT: /usr/share/dotnet
-      ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941"
+      ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
 
     steps:
-      - name: 📥 Klona repo
-        uses: actions/checkout@v3
+    - name: 🧾 Klona repo
+      uses: actions/checkout@v3
 
-      - name: 🟣 Installera .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
+    - name: 🛠️ Installera verktyg
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+        npm install -g newman
 
-      - name: 🧪 Installera Postman CLI
-        run: |
-          npm install -g newman
+    - name: ♻️ Återställ databas från dump
+      run: |
+        psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
 
-      - name: 🛠️ Bygg backend
-        run: dotnet build ./WTP-main/server/server.csproj --configuration Release
+    - name: 🌱 Seed admin-användare
+      run: |
+        psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
-      - name: 🗃️ Återställ databas från dump
-        run: |
-          sudo apt-get update && sudo apt-get install -y postgresql-client
-          psql -h localhost -U postgres -d e2etests < Postman/db/e2etests_dump.sql
-        env:
-          PGPASSWORD: kiviksaif1941
-
-      - name: 🚀 Starta backend
-        run: dotnet run --project ./WTP-main/server/server.csproj &
-        shell: bash
-
-      - name: 🕒 Vänta tills servern är igång
-        run: |
-          echo "Väntar på backend..."
-          sleep 5  # justera vid behov
-
-      - name: 🤖 Kör Postman-tester
-        run: |
-          echo "📁 Innehåll i Postman/:"
-          ls -la Postman/
-          newman run Postman/Wtp.postman_collection.json \
-            -e Postman/WTP.postman_environment.json \
-            --insecure \
-            --reporters cli,json \
-            --reporter-json-export newman-results.json \
-            --export-cookie-jar newman_cookies.json \
-            --verbose
+    - name: 🚀 Kör Postman-tester
+      run: |
+        newman run Postman/Wtp.postman_collection.json \
+          -e Postman/WTP.postman_environment.json \
+          --insecure \
+          --reporters cli,json \
+          --reporter-json-export newman-results.json \
+          --export-cookie-jar newman_cookies.json \
+          --verbose
+            
 
   gui_tests:
     runs-on: ubuntu-latest
-    needs: run-tests
+    needs: test
 
     steps:
       - uses: actions/checkout@v4
