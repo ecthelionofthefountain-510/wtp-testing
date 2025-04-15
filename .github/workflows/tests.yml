@@ -17,14 +17,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Start PostgreSQL
-        uses: Harmon758/postgresql-action@v1
-        with:
-          postgresql version: '15'
-          postgresql db: e2etests
-          postgresql user: postgres
-          postgresql password: kiviksaif1941
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -35,11 +27,20 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install Newman
-        run: npm install -g newman
+      - name: Install EF CLI tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Add EF CLI to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Restore backend dependencies
         run: dotnet restore ./WTP-main/server/server.csproj
+
+      - name: Apply database migrations
+        run: dotnet ef database update --project ./WTP-main/server/server.csproj
+
+      - name: Install Newman
+        run: npm install -g newman
 
       - name: Start backend
         run: dotnet run --project ./WTP-main/server/server.csproj &
