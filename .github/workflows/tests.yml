@@ -50,11 +50,11 @@ jobs:
 
       - name: Kör Postman-tester
         run: |
-          echo "📁 Innehåll i postman/:"
-          ls -la postman/
+          echo "📁 Innehåll i Postman/:"
+          ls -la Postman/
 
-          newman run postman/WTP.postman_collection.json \
-            -e postman/WTP_environment.postman_environment.json \
+          newman run Postman/WTP.postman_collection.json \
+            -e Postman/WTP_environment.postman_environment.json \
             --insecure \
             --reporters cli,json \
             --reporter-json-export newman-results.json \
