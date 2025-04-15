@@ -54,7 +54,7 @@ jobs:
           ls -la Postman/
 
           newman run Postman/WTP.postman_collection.json \
-            -e Postman/WTP_environment.postman_environment.json \
+            -e Postman/WTP.postman_environment.json \
             --insecure \
             --reporters cli,json \
             --reporter-json-export newman-results.json \
