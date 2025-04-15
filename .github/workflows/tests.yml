@@ -27,7 +27,9 @@ jobs:
         run: |
           cd WTP-main/server
           nohup dotnet run --urls "http://localhost:5000" > output.log 2>&1 &
-          sleep 10  # Vänta tills servern är igång
+          echo "Väntar på att servern ska starta..."
+          # Vänta tills servern svarar på basic health check
+          timeout 60 bash -c 'until curl -s http://localhost:5000/api/health; do sleep 2; done'
 
       - name: Run API-Tests (Postman)
         run: |
