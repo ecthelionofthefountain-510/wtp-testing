@@ -229,12 +229,11 @@ public class Program // Deklarerar huvudklassen Program
             }
             catch (Exception ex)
             {
-                Console.WriteLine("❌ Fel vid skapande av användare:");
-                Console.WriteLine($"Meddelande: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
+                Console.WriteLine("❌ FEL VID SKAPA ANVÄNDARE:");
+                Console.WriteLine($"✖️ Exception: {ex.Message}");
+                Console.WriteLine($"📄 StackTrace: {ex.StackTrace}");
 
-                // Logga hela objektet som kom in
-                Console.WriteLine("🔍 Inkommande användardata:");
+                Console.WriteLine("🔍 Inkommande data:");
                 Console.WriteLine($"FirstName: {user.FirstName}");
                 Console.WriteLine($"Password: {user.Password}");
                 Console.WriteLine($"Company: {user.Company}");
