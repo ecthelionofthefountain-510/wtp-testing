@@ -43,8 +43,8 @@ jobs:
 
       - name: Run Postman collection
         run: |
-          newman run ./WTP-testning/Postman/Wtp.postman_collection.json \
-            -e ./WTP-testning/Postman/Wtp.postman_environment.json \
+          newman run ./WTP-testning/Postman/WTP.postman_collection.json \
+          -e ./WTP-testning/Postman/WTP.postman_environment.json \
             --export-cookie-jar newman_cookies.json \
             --reporters cli,json \
             --reporter-json-export newman-results.json \
