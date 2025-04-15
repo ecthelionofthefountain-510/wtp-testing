@@ -41,7 +41,7 @@ jobs:
 
       - name: Run Postman API Tests
         run: |
-          newman run ./Postman/Wtp.postman_collection.json \
+          newman run ./WTP-testning/Postman/WTP.postman_collection.json
            -e ./Postman/Wtp.postman_environment.json \
           --export-cookie-jar newman_cookies.json \
           --reporters cli,json \
