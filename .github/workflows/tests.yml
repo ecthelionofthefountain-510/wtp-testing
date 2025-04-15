@@ -36,7 +36,7 @@ jobs:
     - name: 🛠️ Installera verktyg
       run: |
         sudo apt-get update
-        sudo apt-get install -y postgresql-client curl
+        sudo apt-get install -y postgresql-client
         npm install -g newman
 
     - name: ♻️ Återställ databas från dump
@@ -47,27 +47,11 @@ jobs:
       run: |
         PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
-    - name: ⚙️ Bygg backend
-      run: dotnet build WTP-main/server/WTP-main.csproj --configuration Release
-
-    - name: 🔥 Starta backend-server i bakgrunden
+    - name: 🧱 Bygg och starta backend
       run: |
-        dotnet run --project WTP-main/server/WTP-main.csproj --configuration Release > server.log 2>&1 &
-        echo "Server startad..."
-
-    - name: ⏳ Vänta på att API är redo
-      run: |
-        echo "Väntar på http://localhost:5000/api/chat/auth-status..."
-        for i in {1..30}; do
-          if curl --silent --fail http://localhost:5000/api/chat/auth-status; then
-            echo "✅ API är igång!"
-            exit 0
-          fi
-          echo "⏳ Försök $i: Väntar på API..."
-          sleep 2
-        done
-        echo "❌ Timeout - API startade inte i tid"
-        exit 1
+        dotnet build WTP-main/server/server.csproj --configuration Release
+        dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
+        sleep 10 # Vänta på att servern ska starta
 
     - name: 🚀 Kör Postman-tester
       run: |
