@@ -27,6 +27,7 @@ jobs:
 
     env:
       DOTNET_ROOT: /usr/share/dotnet
+      DOTNET_RUNTIME_ID: linux-x64
       ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
 
     steps:
@@ -47,11 +48,11 @@ jobs:
       run: |
         PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
-    - name: ⚙️ Bygg och starta backend-servern
+    - name: 🧱 Bygg och starta backend
       run: |
-        dotnet build WTP-main/server/server.csproj --configuration Release
-        dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
-        sleep 10  # Vänta på att servern startar innan testerna körs
+        dotnet build WTP-main/server/server.csproj --configuration Release -r $DOTNET_RUNTIME_ID
+        dotnet run --project WTP-main/server/server.csproj --configuration Release --no-build --urls=http://localhost:5000 &
+        sleep 10  # Vänta på att servern startar
 
     - name: 🚀 Kör Postman-tester
       run: |
