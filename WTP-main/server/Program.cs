@@ -230,20 +230,10 @@ public class Program // Deklarerar huvudklassen Program
             }
             catch (Exception ex)
             {
-                Console.WriteLine("❌ FEL VID SKAPA ANVÄNDARE:");
-                Console.WriteLine($"✖️ Exception: {ex.Message}");
-                Console.WriteLine($"📄 StackTrace: {ex.StackTrace}");
-
-                Console.WriteLine("🔍 Inkommande data:");
-                Console.WriteLine($"FirstName: {user.FirstName}");
-                Console.WriteLine($"Password: {user.Password}");
-                Console.WriteLine($"Company: {user.Company}");
-                Console.WriteLine($"Email: {user.Email}");
-                Console.WriteLine($"Role: {user.Role}");
-
+                Console.WriteLine($"[USER CREATE ERROR] {ex.Message}");
                 return Results.BadRequest(new
                 {
-                    message = "Användare kunde inte skapas",
+                    message = "Användare kunde inte skapas", 
                     error = ex.Message
                 });
             }
