@@ -162,7 +162,7 @@ public class Program // Deklarerar huvudklassen Program
             }
         });
         
-        /*// Lägger till användare i databasen
+        // Lägger till användare i databasen
         app.MapPost("/api/users", async (UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
         {
             try
@@ -225,7 +225,7 @@ public class Program // Deklarerar huvudklassen Program
                 });
             }
         });
-        */
+        
 
     app.MapPost("/api/users", async (HttpContext context, UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
 {
