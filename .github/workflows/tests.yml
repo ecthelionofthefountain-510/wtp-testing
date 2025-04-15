@@ -53,7 +53,7 @@ jobs:
           echo "📁 Innehåll i Postman/:"
           ls -la Postman/
 
-          newman run Postman/WTP.postman_collection.json \
+          newman run Postman/Wtp.postman_collection.json \
             -e Postman/WTP.postman_environment.json \
             --insecure \
             --reporters cli,json \
