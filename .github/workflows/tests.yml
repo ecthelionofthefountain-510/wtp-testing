@@ -31,41 +31,38 @@ jobs:
       ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
 
     steps:
-      - name: 🧾 Klona repo
-        uses: actions/checkout@v3
+    - name: 🧾 Klona repo
+      uses: actions/checkout@v3
 
-      - name: 🧐 Lista alla filer i projektet
-        run: ls -R
+    - name: 🛠️ Installera verktyg
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+        npm install -g newman
 
-      - name: 🛠️ Installera verktyg
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-          npm install -g newman
+    - name: ♻️ Återställ databas från dump
+      run: |
+        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
 
-      - name: ♻️ Återställ databas från dump
-        run: |
-          PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f postman/db/e2etests_dump.sql
+    - name: 🌱 Seed admin-användare
+      run: |
+        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
-      - name: 🌱 Seed admin-användare
-        run: |
-          PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f postman/db/seed_admin.sql
+    - name: 🚀 Bygg och starta backend
+      run: |
+        dotnet build WTP-main/server/server.csproj --configuration Release
+        dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
+        sleep 10  # Vänta på att servern startar
 
-      - name: 🏗️ Bygg och starta API-server
-        run: |
-          dotnet build WTP-main/server/server.csproj --configuration Release
-          dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
-          sleep 10
-
-      - name: 📮 Kör Postman-tester med Newman
-        run: |
-          newman run postman/WTP.postman_collection.json \
-            -e postman/WTP.postman_environment.json \
-            --insecure \
-            --reporters cli,json \
-            --reporter-json-export newman-results.json \
-            --export-cookie-jar newman_cookies.json \
-            --verbose
+    - name: 📮 Kör Postman-tester
+      run: |
+        newman run Postman/WTP.postman_collection.json \
+          -e Postman/WTP.postman_environment.json \
+          --insecure \
+          --reporters cli,json \
+          --reporter-json-export newman-results.json \
+          --export-cookie-jar newman_cookies.json \
+          --verbose
 
   gui_tests:
     runs-on: ubuntu-latest
@@ -74,19 +71,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: 🧰 Installera .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore E2E dependencies
+      - name: 📦 Restore E2E dependencies
         run: dotnet restore ./E2ETesting-main/E2ETesting.csproj
 
-      - name: Build E2E Test Project
+      - name: ⚙️ Build E2E Test Project
         run: dotnet build ./E2ETesting-main/E2ETesting.csproj
 
-      - name: Install Playwright Browsers
+      - name: 🧪 Installera Playwright-browsers
         run: pwsh ./E2ETesting-main/bin/Debug/net8.0/playwright.ps1 install --with-deps
 
-      - name: Run Playwright Tests
+      - name: 🧪 Kör Playwright GUI-tester
         run: dotnet test ./E2ETesting-main/E2ETesting.csproj
