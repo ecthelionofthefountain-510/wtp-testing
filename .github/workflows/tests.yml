@@ -31,47 +31,41 @@ jobs:
       ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
 
     steps:
-    - name: 🧾 Klona repo
-      uses: actions/checkout@v3
+      - name: 🧾 Klona repo
+        uses: actions/checkout@v3
 
-    - name: 🛠️ Installera verktyg
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y postgresql-client curl
-        npm install -g newman
+      - name: 🧐 Lista alla filer i projektet
+        run: ls -R
 
-    - name: ♻️ Återställ databas från dump
-      run: |
-        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
+      - name: 🛠️ Installera verktyg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          npm install -g newman
 
-    - name: 🌱 Seed admin-användare
-      run: |
-        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
+      - name: ♻️ Återställ databas från dump
+        run: |
+          PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f postman/db/e2etests_dump.sql
 
-    - name: 🚀 Bygg och starta backend
-      run: |
-        dotnet build WTP-main/server/server.csproj --configuration Release -r $DOTNET_RUNTIME_ID
-        dotnet run --project WTP-main/server/server.csproj --configuration Release --no-build --urls=http://localhost:5000 &
-        echo "⏳ Väntar på att backend svarar..."
-        for i in {1..30}; do
-          if curl --silent --fail http://localhost:5000/api/chat/auth-status; then
-            echo "✅ Servern svarar!";
-            break;
-          else
-            echo "⏳ Försök $i...";
-            sleep 1;
-          fi
-        done
+      - name: 🌱 Seed admin-användare
+        run: |
+          PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f postman/db/seed_admin.sql
 
-    - name: 📮 Kör Postman-tester med Newman
-      run: |
-        newman run Postman/WTP.postman_collection.json \
-          -e Postman/WTP.postman_environment.json \
-          --insecure \
-          --reporters cli,json \
-          --reporter-json-export newman-results.json \
-          --export-cookie-jar newman_cookies.json \
-          --verbose
+      - name: 🏗️ Bygg och starta API-server
+        run: |
+          dotnet build WTP-main/server/server.csproj --configuration Release
+          dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
+          sleep 10
+
+      - name: 📮 Kör Postman-tester med Newman
+        run: |
+          newman run postman/WTP.postman_collection.json \
+            -e postman/WTP.postman_environment.json \
+            --insecure \
+            --reporters cli,json \
+            --reporter-json-export newman-results.json \
+            --export-cookie-jar newman_cookies.json \
+            --verbose
 
   gui_tests:
     runs-on: ubuntu-latest
