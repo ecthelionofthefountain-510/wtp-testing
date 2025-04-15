@@ -292,7 +292,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"KevinTele5\",\n  \"password\": \"test123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\",\n  \"email\": \"kevin4.l@gmail.com\"\n}",
+							"raw": "{\n  \"firstName\": \"KevinTeleX\",\n  \"password\": \"test123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\",\n  \"email\": \"kevin7.l@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
