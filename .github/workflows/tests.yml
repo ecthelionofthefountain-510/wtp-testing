@@ -23,18 +23,6 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Create tmp folder and valid empty cookie file
-        run: |
-          mkdir -p tmp
-          echo -n '{}' | jq '.' > tmp/cookies.json
-          cat tmp/cookies.json
-          file tmp/cookies.json
-
-      - name: Visa innehåll i tmp-mappen (debug)
-        run: |
-          ls -la tmp
-          cat tmp/cookies.json
-
       - name: Start server (background)
         run: |
           cd WTP-main/server
@@ -71,4 +59,3 @@ jobs:
       - name: Run Playwright GUI Tests
         run: dotnet test ./E2ETesting-main/E2ETesting.csproj
 
-        
