@@ -1,53 +1,54 @@
-name: CI/CD Test
+name: API Tests with Newman
 
 on:
   push:
-    branches: ["main"]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   api_tests:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '18'
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: '8.0.x'
 
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Start backend (in background)
+      - name: Restore server dependencies
+        working-directory: ./WTP-main/server
+        run: dotnet restore
+
+      - name: Build and run server
+        working-directory: ./WTP-main/server
+        run: dotnet run &
+
+      - name: Wait for server to start
+        run: sleep 10
+
+      - name: Run Postman collection
         run: |
-          cd WTP-main/server
-          nohup dotnet run --urls "http://localhost:5000" > output.log 2>&1 &
-
-      - name: Wait for backend to start
-        run: sleep 25
-
-      # - name: Health check (optional men smart)
-      #   run: |
-      #     echo "Kontrollerar att backend svarar..."
-      #     curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health || echo "Health-check misslyckades, men fortsätter ändå"
-
-    
-
-      - name: Run API tests with Newman
-        working-directory: ../WTP-testning
-        run: |
-          newman run ./Postman/WTP.postman_collection.json \
-          -e ./Postman/Wtp.postman_environment.json \
-          --export-cookie-jar newman_cookies.json \
-          --reporters cli,json \
-          --reporter-json-export newman-results.json \
-          --bail
+          newman run ./WTP-testning/Postman/WTP.postman_collection.json \
+            -e ./WTP-testning/Postman/Wtp.postman_environment.json \
+            --export-cookie-jar newman_cookies.json \
+            --reporters cli,json \
+            --reporter-json-export newman-results.json \
+            --bail
 
   gui_tests:
     runs-on: ubuntu-latest
