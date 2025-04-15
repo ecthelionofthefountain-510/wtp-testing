@@ -36,7 +36,7 @@ jobs:
     - name: 🛠️ Installera verktyg
       run: |
         sudo apt-get update
-        sudo apt-get install -y postgresql-client
+        sudo apt-get install -y postgresql-client curl
         npm install -g newman
 
     - name: ♻️ Återställ databas från dump
@@ -47,6 +47,28 @@ jobs:
       run: |
         PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
+    - name: ⚙️ Bygg backend
+      run: dotnet build WTP-main/server/WTP-main.csproj --configuration Release
+
+    - name: 🔥 Starta backend-server i bakgrunden
+      run: |
+        dotnet run --project WTP-main/server/WTP-main.csproj --configuration Release > server.log 2>&1 &
+        echo "Server startad..."
+
+    - name: ⏳ Vänta på att API är redo
+      run: |
+        echo "Väntar på http://localhost:5000/api/chat/auth-status..."
+        for i in {1..30}; do
+          if curl --silent --fail http://localhost:5000/api/chat/auth-status; then
+            echo "✅ API är igång!"
+            exit 0
+          fi
+          echo "⏳ Försök $i: Väntar på API..."
+          sleep 2
+        done
+        echo "❌ Timeout - API startade inte i tid"
+        exit 1
+
     - name: 🚀 Kör Postman-tester
       run: |
         newman run Postman/Wtp.postman_collection.json \
@@ -56,7 +78,6 @@ jobs:
           --reporter-json-export newman-results.json \
           --export-cookie-jar newman_cookies.json \
           --verbose
-            
 
   gui_tests:
     runs-on: ubuntu-latest
