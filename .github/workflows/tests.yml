@@ -39,10 +39,11 @@ jobs:
 
     
 
-      - name: Run Postman API Tests
+      - name: Run API tests with Newman
+        working-directory: ../WTP-testning
         run: |
-          newman run ./WTP-testning/Postman/WTP.postman_collection.json
-           -e ./Postman/Wtp.postman_environment.json \
+          newman run ./Postman/WTP.postman_collection.json \
+          -e ./Postman/Wtp.postman_environment.json \
           --export-cookie-jar newman_cookies.json \
           --reporters cli,json \
           --reporter-json-export newman-results.json \
