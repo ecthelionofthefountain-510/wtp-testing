@@ -47,11 +47,11 @@ jobs:
       run: |
         PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
 
-    - name: 🧱 Bygg och starta backend
+    - name: ⚙️ Bygg och starta backend-servern
       run: |
         dotnet build WTP-main/server/server.csproj --configuration Release
         dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
-        sleep 10 # Vänta på att servern ska starta
+        sleep 10  # Vänta på att servern startar innan testerna körs
 
     - name: 🚀 Kör Postman-tester
       run: |
