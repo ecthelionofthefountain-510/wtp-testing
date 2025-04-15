@@ -229,9 +229,13 @@ public class Program // Deklarerar huvudklassen Program
             }
             catch (Exception ex)
             {
+                Console.WriteLine("❌ Fel vid skapande av användare:");
+                Console.WriteLine("Meddelande: " + ex.Message);
+                Console.WriteLine("StackTrace: " + ex.StackTrace);
+
                 return Results.BadRequest(new
                 {
-                    message = "Användare kunde inte skapas", 
+                    message = "Användare kunde inte skapas",
                     error = ex.Message
                 });
             }
