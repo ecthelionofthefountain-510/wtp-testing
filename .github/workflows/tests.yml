@@ -30,25 +30,36 @@ jobs:
       - name: Install Newman
         run: npm install -g newman
 
-      - name: Restore server dependencies
-        working-directory: ./WTP-main/server
-        run: dotnet restore
+      - name: Restore backend dependencies
+        run: dotnet restore ./WTP-main/server/server.csproj
 
-      - name: Build and run server
-        working-directory: ./WTP-main/server
-        run: dotnet run &
+      - name: Start backend
+        run: dotnet run --project ./WTP-main/server/server.csproj &
+      
+      - name: Vänta på backend
+        run: sleep 20
 
-      - name: Wait for server to start
-        run: sleep 10
-
-      - name: Run Postman collection
+      - name: Kontrollera att backend körs
         run: |
-          newman run Postman/WTP.postman_collection.json \
-            -e Postman/WTP.postman_environment.json \
-            --export-cookie-jar newman_cookies.json \
+          echo "🔄 Kollar om backend svarar..."
+          curl -v http://localhost:5000/api/health || echo "Health endpoint svarar inte, vi går ändå vidare."
+          echo "🔐 Testar login..."
+          curl -v -X POST http://localhost:5000/api/login \
+            -H "Content-Type: application/json" \
+            -d '{"username":"admin@admin.com","password":"admin321"}' || echo "Login svarar inte, vi går ändå vidare."
+
+      - name: Kör Postman-tester
+        run: |
+          echo "📁 Innehåll i postman/:"
+          ls -la postman/
+
+          newman run postman/WTP.postman_collection.json \
+            -e postman/WTP_environment.postman_environment.json \
+            --insecure \
             --reporters cli,json \
             --reporter-json-export newman-results.json \
-            --bail
+            --export-cookie-jar newman_cookies.json \
+            --verbose
 
   gui_tests:
     runs-on: ubuntu-latest
