@@ -70,3 +70,5 @@ jobs:
 
       - name: Run Playwright GUI Tests
         run: dotnet test ./E2ETesting-main/E2ETesting.csproj
+
+        
