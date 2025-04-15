@@ -1,4 +1,4 @@
-name: API Tests with Newman
+name: Run Postman + Playwright tests
 
 on:
   push:
@@ -7,58 +7,61 @@ on:
     branches: [ main ]
 
 jobs:
-  api_tests:
+  run-tests:
     runs-on: ubuntu-latest
 
     services:
       postgres:
         image: postgres:15
-        ports:
-          - 5432:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: kiviksaif1941
           POSTGRES_DB: e2etests
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DOTNET_ROOT: /usr/share/dotnet
+      ConnectionStrings__DefaultConnection: "Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941"
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: 📥 Klona repo
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: 🟣 Installera .NET
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install PostgreSQL client
-        run: sudo apt-get install -y postgresql-client
+      - name: 🧪 Installera Postman CLI
+        run: |
+          npm install -g newman
 
-      - name: Kör migration.sql manuellt
+      - name: 🛠️ Bygg backend
+        run: dotnet build ./WTP-main/server/server.csproj --configuration Release
+
+      - name: 🗃️ Återställ databas från dump
+        run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d e2etests < Postman/db/e2etests_dump.sql
         env:
           PGPASSWORD: kiviksaif1941
-        run: |
-          echo "📦 Initierar tabeller från migration.sql..."
-          psql -h localhost -U postgres -d e2etests -f ./WTP-main/server/migration.sql
 
-      - name: Install Newman
-        run: npm install -g newman
-
-      - name: Start backend
+      - name: 🚀 Starta backend
         run: dotnet run --project ./WTP-main/server/server.csproj &
+        shell: bash
 
-      - name: Vänta på backend
-        run: sleep 10
+      - name: 🕒 Vänta tills servern är igång
+        run: |
+          echo "Väntar på backend..."
+          sleep 5  # justera vid behov
 
-      - name: Kör Postman-tester
+      - name: 🤖 Kör Postman-tester
         run: |
           echo "📁 Innehåll i Postman/:"
           ls -la Postman/
@@ -72,7 +75,7 @@ jobs:
 
   gui_tests:
     runs-on: ubuntu-latest
-    needs: api_tests
+    needs: run-tests
 
     steps:
       - uses: actions/checkout@v4
