@@ -52,7 +52,16 @@ jobs:
       run: |
         dotnet build WTP-main/server/server.csproj --configuration Release -r $DOTNET_RUNTIME_ID
         dotnet run --project WTP-main/server/server.csproj --configuration Release --no-build --urls=http://localhost:5000 &
-        sleep 10  # Vänta på att servern startar
+        echo "⏳ Väntar på att servern ska svara..."
+        for i in {1..30}; do
+          if curl --silent --fail http://localhost:5000/api/chat/auth-status; then
+            echo "✅ Servern svarar!";
+            break;
+          else
+            echo "⏳ Försök $i...";
+            sleep 1;
+          fi
+        done
 
     - name: 🚀 Kör Postman-tester
       run: |
