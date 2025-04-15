@@ -176,6 +176,7 @@ public class Program // Deklarerar huvudklassen Program
         // Lägger till användare i databasen
         app.MapPost("/api/users", async (UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
         {
+            Console.WriteLine(">>> Kom in i /api/users endpoint!");
             try
             {
                 // Determine role_id based on role
