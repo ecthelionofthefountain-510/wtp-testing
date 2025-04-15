@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Npgsql;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Mvc;
 
 namespace server;
 
@@ -174,7 +175,7 @@ public class Program // Deklarerar huvudklassen Program
         
         
         // Lägger till användare i databasen
-        app.MapPost("/api/users", async (UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
+        app.MapPost("/api/users", async ([FromBody] UserForm user, NpgsqlDataSource db, IEmailService emailService) =>
         {
             Console.WriteLine(">>> Kom in i /api/users endpoint!");
             try
