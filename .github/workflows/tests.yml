@@ -37,21 +37,16 @@ jobs:
       #     echo "Kontrollerar att backend svarar..."
       #     curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/api/health || echo "Health-check misslyckades, men fortsätter ändå"
 
-      - name: Admin login test (kontroll att session/cookies fungerar)
-        run: |
-          curl -v -X POST http://localhost:5000/api/login \
-            -H "Content-Type: application/json" \
-            -c newman_cookies.txt \
-            -d '{"username": "KevinAdmin", "password": "abc123"}' || echo "Login misslyckades, men fortsätter ändå"
+    
 
-      - name: Run Postman API Tests with cookie jar
+      - name: Run Postman API Tests
         run: |
           newman run ./Postman/Wtp.postman_collection.json \
-            -e ./Postman/Wtp.postman_environment.json \
-            --cookie-jar newman_cookies.txt \
-            --reporters cli,json \
-            --reporter-json-export newman-results.json \
-            --bail
+           -e ./Postman/Wtp.postman_environment.json \
+          --export-cookie-jar newman_cookies.json \
+          --reporters cli,json \
+          --reporter-json-export newman-results.json \
+          --bail
 
   gui_tests:
     runs-on: ubuntu-latest
