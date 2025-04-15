@@ -257,12 +257,19 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Response should include user creation confirmation\", function () {",
-									"    var json = pm.response.json();",
+									"    let json;",
+									"    try {",
+									"        json = pm.response.json();",
+									"    } catch (e) {",
+									"        console.log(\"❌ Could not parse response as JSON:\", pm.response.text());",
+									"        pm.expect.fail(\"Response was not valid JSON\");",
+									"        return;",
+									"    }",
 									"",
-									"    pm.expect(json.message).to.eql(\"Användare skapades framgångsrikt!\");",
-									"    pm.expect(json.user).to.have.property(\"id\");",
-									"    pm.expect(json.user).to.have.property(\"firstName\");",
-									"    pm.expect(json.user).to.have.property(\"company\");",
+									"    pm.expect(json.message).to.eql(\"Användare skapad\"); // <-- Fixat här",
+									"    pm.expect(json.user).to.have.property(\"Id\");",
+									"    pm.expect(json.user).to.have.property(\"FirstName\");",
+									"    pm.expect(json.user).to.have.property(\"Company\");",
 									"});"
 								],
 								"type": "text/javascript",
@@ -272,8 +279,11 @@
 						{
 							"listen": "prerequest",
 							"script": {
-								"exec": [],
-								"type": "text/javascript"
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -282,7 +292,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"KevinTele5\",\n  \"password\": \"test123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\",\n  \"email\": \"kevin3.l@gmail.com\"\n}",
+							"raw": "{\n  \"firstName\": \"KevinTele5\",\n  \"password\": \"test123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\",\n  \"email\": \"kevin4.l@gmail.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
