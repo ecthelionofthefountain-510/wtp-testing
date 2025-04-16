@@ -67,7 +67,7 @@ jobs:
       - name: 📮 Run Postman tests with HTML report
         run: |
             npm install -g newman newman-reporter-htmlextra
-            newman run Postman/WTP_CI_LoginFix.postman_collection
+            newman run Postman/WTP_CI_LoginFix.postman_collection.json
               -e Postman/WTP.postman_environment.json \
               --insecure \
               --reporters cli,json,htmlextra \
