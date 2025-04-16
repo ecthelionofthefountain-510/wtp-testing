@@ -55,7 +55,7 @@ jobs:
 
     - name: 📮 Kör Postman-tester
       run: |
-        newman run Postman/WTP.postman_collection.json \
+        newman run Postman/WTP_CI_Fixed.postman_collection.json \
           -e Postman/WTP.postman_environment.json \
           --insecure \
           --reporters cli,json \
