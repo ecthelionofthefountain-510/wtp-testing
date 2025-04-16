@@ -177,30 +177,22 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Spara auth-cookie f\u00f6r framtida requests",
                   "if (pm.response.code === 200) {",
-                  "  // Kontrollera att svaret inneh\u00e5ller user",
-                  "  pm.test(\"Inloggning lyckades\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.user).to.exist;",
+                  "  pm.test(\"\u2705 Inloggning lyckades\", function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.success).to.be.true;",
                   "  });",
-                  "  ",
-                  "  // Spara cookie i milj\u00f6n",
                   "  if (pm.cookies.has(\"connect.sid\")) {",
                   "    pm.environment.set(\"authCookie\", pm.cookies.get(\"connect.sid\"));",
+                  "    console.log(\"\u2705 Cookie sparad:\", pm.cookies.get(\"connect.sid\"));",
+                  "  } else {",
+                  "    console.warn(\"\u274c Ingen cookie returnerades av servern.\");",
                   "  }",
                   "} else {",
-                  "  pm.test(\"Inloggning misslyckades\", function() {",
+                  "  pm.test(\"\u274c Inloggning misslyckades\", function () {",
                   "    pm.expect.fail(\"Fel statuskod: \" + pm.response.code);",
                   "  });",
-                  "}",
-                  "// \ud83d\udd12 DEBUG: Login info",
-                  "console.log(\"\ud83d\ude80 Request body:\", pm.request.body);",
-                  "console.log(\"\ud83d\udd12 Response status:\", pm.response.code);",
-                  "console.log(\"\ud83e\uddfe Response body:\", pm.response.text());",
-                  "console.log(\"\ud83d\udce6 Response headers:\", JSON.stringify(pm.response.headers.toObject(), null, 2));",
-                  "console.log(\"\ud83c\udf6a Cookies:\", JSON.stringify(pm.cookies.toObject(), null, 2));"
+                  "}"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -229,7 +221,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"kevin.admin@gmail.com\",\n  \"password\": \"abc123\"\n}",
+              "raw": "{\n  \"login_id\": \"kevin.admin@gmail.com\",\n  \"password\": \"abc123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

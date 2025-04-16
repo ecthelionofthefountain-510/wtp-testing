@@ -1,18 +1,17 @@
-name: Kör E2E Tester
+name: 🧪 Run Postman and Playwright Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       postgres:
-        image: postgres:15
+        image: postgres:13
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: kiviksaif1941
@@ -25,43 +24,44 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    env:
-      DOTNET_ROOT: /usr/share/dotnet
-      ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
-
     steps:
-    - name: 🧾 Klona repo
-      uses: actions/checkout@v3
+      - name: ⬇️ Check out code
+        uses: actions/checkout@v3
 
-    - name: 🛠️ Installera verktyg
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y postgresql-client
-        npm install -g newman
+      - name: ⚙️ Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: ♻️ Återställ databas från dump
-      run: |
-        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
+      - name: 🧪 Install dependencies
+        run: |
+          dotnet tool restore
+          dotnet restore
 
-    - name: 🌱 Seed admin-användare
-      run: |
-        PGPASSWORD=kiviksaif1941 psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
+      - name: 🗃️ Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
 
-    - name: 🚀 Bygg och starta backend
-      run: |
-        dotnet build WTP-main/server/server.csproj --configuration Release
-        dotnet run --project WTP-main/server/server.csproj --urls=http://localhost:5000 &
-        sleep 10  # Vänta på att servern startar
+      - name: ♻️ Reset and seed test database
+        run: |
+          psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
+          psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
+        env:
+          PGPASSWORD: kiviksaif1941
 
-    - name: 📮 Kör Postman-tester
-      run: |
-        newman run Postman/WTP_CI_Fixed.postman_collection.json \
-          -e Postman/WTP.postman_environment.json \
-          --insecure \
-          --reporters cli,json \
-          --reporter-json-export newman-results.json \
-          --export-cookie-jar newman_cookies.json \
-          --verbose
+      - name: 🧪 Run Postman tests
+        run: |
+          newman run Postman/WTP_CI_LoginFix.postman_collection.json             -e Postman/WTP.postman_environment.json             --insecure             --reporters cli,json             --reporter-json-export newman-results.json             --export-cookie-jar newman_cookies.json             --verbose
+        shell: /usr/bin/bash -e {0}
+        env:
+          DOTNET_ROOT: /usr/share/dotnet
+          ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
+
+      - name: 💻 Run Playwright/SpecFlow GUI tests
+        run: dotnet test E2ETesting-main
 
   gui_tests:
     runs-on: ubuntu-latest
