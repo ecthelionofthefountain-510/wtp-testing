@@ -344,7 +344,7 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									"console.log(\"Användar-ID som används för uppdatering: \" + pm.environment.get(\"testUserId\"));"
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
