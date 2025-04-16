@@ -7,7 +7,7 @@
   },
   "item": [
     {
-      "name": "Fullt automatiserat flöde",
+      "name": "Fullt automatiserat fl\u00f6de",
       "item": [
         {
           "name": "Skicka in tele",
@@ -20,11 +20,11 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Formulär skickat\", function() {",
+                  "pm.test(\"Formul\u00e4r skickat\", function() {",
                   "  var jsonData = pm.response.json();",
                   "  pm.expect(jsonData.success).to.be.true;",
                   "  ",
-                  "  // Spara chatToken för senare användning",
+                  "  // Spara chatToken f\u00f6r senare anv\u00e4ndning",
                   "  if (jsonData.chatLink) {",
                   "    const tokenMatch = jsonData.chatLink.match(/\\/chat\\/(.+)$/);",
                   "    if (tokenMatch && tokenMatch[1]) {",
@@ -48,7 +48,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"serviceType\": \"Bredband\",\n  \"issueType\": \"Tekniskt problem\",\n  \"message\": \"Testar ett formulär för teleärenden\",\n  \"companyType\": \"Tele/Bredband\"\n}",
+              "raw": "{\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"serviceType\": \"Bredband\",\n  \"issueType\": \"Tekniskt problem\",\n  \"message\": \"Testar ett formul\u00e4r f\u00f6r tele\u00e4renden\",\n  \"companyType\": \"Tele/Bredband\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -79,7 +79,7 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Formulär skickat\", function() {",
+                  "pm.test(\"Formul\u00e4r skickat\", function() {",
                   "  var jsonData = pm.response.json();",
                   "  pm.expect(jsonData.success).to.be.true;",
                   "});"
@@ -99,7 +99,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"registrationNumber\": \"ABC123\",\n  \"issueType\": \"Garantiärende\",\n  \"message\": \"Testar ett formulär för fordonsärenden\",\n  \"companyType\": \"Fordonsservice\"\n}",
+              "raw": "{\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"registrationNumber\": \"ABC123\",\n  \"issueType\": \"Garanti\u00e4rende\",\n  \"message\": \"Testar ett formul\u00e4r f\u00f6r fordons\u00e4renden\",\n  \"companyType\": \"Fordonsservice\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -120,7 +120,7 @@
           "response": []
         },
         {
-          "name": "Skicka in Försäkringsärende",
+          "name": "Skicka in F\u00f6rs\u00e4krings\u00e4rende",
           "event": [
             {
               "listen": "test",
@@ -130,7 +130,7 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Formulär skickat\", function() {",
+                  "pm.test(\"Formul\u00e4r skickat\", function() {",
                   "  var jsonData = pm.response.json();",
                   "  pm.expect(jsonData.success).to.be.true;",
                   "});"
@@ -150,7 +150,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"insuranceType\": \"Hemförsäkring\",\n  \"issueType\": \"Frågor om försäkringsskydd\",\n  \"message\": \"Testar ett formulär för försäkringsärenden\",\n  \"companyType\": \"Försäkringsärenden\"\n}",
+              "raw": "{\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"insuranceType\": \"Hemf\u00f6rs\u00e4kring\",\n  \"issueType\": \"Fr\u00e5gor om f\u00f6rs\u00e4kringsskydd\",\n  \"message\": \"Testar ett formul\u00e4r f\u00f6r f\u00f6rs\u00e4krings\u00e4renden\",\n  \"companyType\": \"F\u00f6rs\u00e4krings\u00e4renden\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -178,18 +178,18 @@
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "  pm.test(\"✅ Inloggning lyckades\", function () {",
+                  "  pm.test(\"\u2705 Inloggning lyckades\", function () {",
                   "    var json = pm.response.json();",
                   "    pm.expect(json.success).to.be.true;",
                   "  });",
                   "  if (pm.cookies.has(\"connect.sid\")) {",
                   "    pm.environment.set(\"authCookie\", pm.cookies.get(\"connect.sid\"));",
-                  "    console.log(\"✅ Cookie sparad:\", pm.cookies.get(\"connect.sid\"));",
+                  "    console.log(\"\u2705 Cookie sparad:\", pm.cookies.get(\"connect.sid\"));",
                   "  } else {",
-                  "    console.warn(\"❌ Ingen cookie returnerades av servern.\");",
+                  "    console.warn(\"\u274c Ingen cookie returnerades av servern.\");",
                   "  }",
                   "} else {",
-                  "  pm.test(\"❌ Inloggning misslyckades\", function () {",
+                  "  pm.test(\"\u274c Inloggning misslyckades\", function () {",
                   "    pm.expect.fail(\"Fel statuskod: \" + pm.response.code);",
                   "  });",
                   "}"
@@ -221,7 +221,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"kevin.admin@gmail.com\",\n  \"password\": \"abc123\"\n}",
+              "raw": "{\n  \"login_id\": \"kevin.admin@gmail.com\",\n  \"password\": \"abc123\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -242,7 +242,7 @@
           "response": []
         },
         {
-          "name": "Skapa användare",
+          "name": "Skapa anv\u00e4ndare",
           "event": [
             {
               "listen": "test",
@@ -252,16 +252,16 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Användare skapad\", function() {",
+                  "pm.test(\"Anv\u00e4ndare skapad\", function() {",
                   "  var jsonData = pm.response.json();",
-                  "  pm.expect(jsonData.message).to.equal(\"Användare skapad\");",
+                  "  pm.expect(jsonData.message).to.equal(\"Anv\u00e4ndare skapad\");",
                   "  ",
-                  "  // Spara användar-ID för senare användning",
+                  "  // Spara anv\u00e4ndar-ID f\u00f6r senare anv\u00e4ndning",
                   "  if (jsonData.user && jsonData.user.id) {",
                   "    pm.environment.set(\"testUserId\", jsonData.user.id);",
                   "    console.log(\"testUserId satt till: \" + jsonData.user.id);",
                   "  } else {",
-                  "    console.log(\"Kunde inte sätta testUserId, user: \", JSON.stringify(jsonData.user));",
+                  "    console.log(\"Kunde inte s\u00e4tta testUserId, user: \", JSON.stringify(jsonData.user));",
                   "  }",
                   "});"
                 ],
@@ -280,7 +280,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"TestAnvändare\",\n  \"password\": \"Lösenord123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\",\n  \"email\": \"testuser@example.com\"\n}",
+              "raw": "{\n  \"firstName\": \"TestAnv\u00e4ndare\",\n  \"password\": \"L\u00f6senord123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\",\n  \"email\": \"testuser@example.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -301,7 +301,7 @@
           "response": []
         },
         {
-          "name": "Uppdatera användare",
+          "name": "Uppdatera anv\u00e4ndare",
           "event": [
             {
               "listen": "test",
@@ -311,14 +311,14 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Användare uppdaterad\", function() {",
+                  "pm.test(\"Anv\u00e4ndare uppdaterad\", function() {",
                   "  try {",
                   "    var jsonData = pm.response.json();",
                   "    pm.expect(jsonData.message).to.include(\"Uppgifterna uppdaterades\");",
                   "  } catch (error) {",
                   "    console.error(\"Fel vid parsning av respons: \", error);",
                   "    console.log(\"Respons-text: \", pm.response.text());",
-                  "    pm.expect.fail(\"Kunde inte uppdatera användare: \" + error.message);",
+                  "    pm.expect.fail(\"Kunde inte uppdatera anv\u00e4ndare: \" + error.message);",
                   "  }",
                   "});"
                 ],
@@ -330,7 +330,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "console.log(\"Användar-ID som används för uppdatering: \" + pm.environment.get(\"testUserId\"));"
+                  "console.log(\"Anv\u00e4ndar-ID som anv\u00e4nds f\u00f6r uppdatering: \" + pm.environment.get(\"testUserId\"));"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -347,7 +347,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"UppdateradAnv\\u00e4ndare\",\n  \"password\": \"NyttL\\u00f6senord123\",\n  \"company\": \"tele\",\n  \"role\": \"staff\"\n}",
+              "raw": "{\n  \"firstName\": \"UppdateradAnv\u00e4ndare\",\n  \"password\": \"NyttL\u00f6senord123\",\n  \"company\": \"\",\n  \"role\": \"\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -369,7 +369,7 @@
           "response": []
         },
         {
-          "name": "Radera användare",
+          "name": "Radera anv\u00e4ndare",
           "event": [
             {
               "listen": "test",
@@ -379,18 +379,18 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Användare borttagen\", function() {",
+                  "pm.test(\"Anv\u00e4ndare borttagen\", function() {",
                   "  try {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.message).to.equal(\"Användare borttagen\");",
+                  "    pm.expect(jsonData.message).to.equal(\"Anv\u00e4ndare borttagen\");",
                   "  } catch (error) {",
                   "    console.error(\"Fel vid parsning av respons: \", error);",
                   "    console.log(\"Respons-text: \", pm.response.text());",
-                  "    pm.expect.fail(\"Kunde inte radera användare: \" + error.message);",
+                  "    pm.expect.fail(\"Kunde inte radera anv\u00e4ndare: \" + error.message);",
                   "  }",
                   "});",
                   "",
-                  "// Rensa användar-ID",
+                  "// Rensa anv\u00e4ndar-ID",
                   "pm.environment.unset(\"testUserId\");"
                 ],
                 "type": "text/javascript",
@@ -401,7 +401,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "console.log(\"Användar-ID som ska raderas: \" + pm.environment.get(\"testUserId\"));"
+                  "console.log(\"Anv\u00e4ndar-ID som ska raderas: \" + pm.environment.get(\"testUserId\"));"
                 ],
                 "type": "text/javascript",
                 "packages": {}
@@ -440,7 +440,7 @@
           "response": []
         },
         {
-          "name": "Hämta alla ärenden",
+          "name": "H\u00e4mta alla \u00e4renden",
           "event": [
             {
               "listen": "test",
@@ -450,7 +450,7 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Ärenden returnerades\", function() {",
+                  "pm.test(\"\u00c4renden returnerades\", function() {",
                   "  var jsonData = pm.response.json();",
                   "  pm.expect(jsonData).to.be.an(\"array\");",
                   "});"
@@ -469,10 +469,6 @@
               {
                 "key": "Cookie",
                 "value": "connect.sid={{authCookie}}"
-              },
-              {
-                "key": "usercompany",
-                "value": "tele"
               }
             ],
             "body": {
@@ -498,7 +494,7 @@
           "response": []
         },
         {
-          "name": "Hämta specifik chatt",
+          "name": "H\u00e4mta specifik chatt",
           "event": [
             {
               "listen": "test",
@@ -575,7 +571,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"chatToken\": \"{{chatToken}}\",\n  \"sender\": \"TestAnvändare\",\n  \"message\": \"Detta är ett testmeddelande\"\n}",
+              "raw": "{\n  \"chatToken\": \"{{chatToken}}\",\n  \"sender\": \"TestAnv\u00e4ndare\",\n  \"message\": \"Detta \u00e4r ett testmeddelande\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -597,7 +593,7 @@
           "response": []
         },
         {
-          "name": "Arkivera ärenden",
+          "name": "Arkivera \u00e4renden",
           "event": [
             {
               "listen": "test",
@@ -607,7 +603,7 @@
                   "  pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Ärende arkiverat\", function() {",
+                  "pm.test(\"\u00c4rende arkiverat\", function() {",
                   "  var jsonData = pm.response.json();",
                   "  pm.expect(jsonData.message).to.include(\"Ticket archived successfully\");",
                   "});"
@@ -627,7 +623,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"chatToken\": \"{{chatToken}}\",\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"issueType\": \"Tekniskt problem\",\n  \"message\": \"Testar ett ärende\",\n  \"formType\": \"Tele/Bredband\",\n  \"determineTable\": \"tele_forms\",\n  \"resolutionNotes\": \"Ärendet har lösts under testning\"\n}",
+              "raw": "{\n  \"chatToken\": \"{{chatToken}}\",\n  \"firstName\": \"TestKund\",\n  \"email\": \"testkund@example.com\",\n  \"issueType\": \"Tekniskt problem\",\n  \"message\": \"Testar ett \u00e4rende\",\n  \"formType\": \"Tele/Bredband\",\n  \"determineTable\": \"tele_forms\",\n  \"resolutionNotes\": \"\u00c4rendet har l\u00f6sts under testning\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -698,7 +694,7 @@
           "response": []
         }
       ],
-      "description": "Detta flöde kör hela arbetsflödet enligt användarens önskade ordning."
+      "description": "Detta fl\u00f6de k\u00f6r hela arbetsfl\u00f6det enligt anv\u00e4ndarens \u00f6nskade ordning."
     }
   ]
 }
