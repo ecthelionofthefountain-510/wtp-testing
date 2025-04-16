@@ -33,10 +33,13 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: 🧪 Install dependencies
-        run: |
-          dotnet tool restore
-          dotnet restore
+      - name: 🧱 Restore backend dependencies
+        working-directory: ./WTP-main/server
+        run: dotnet restore
+
+      - name: 🧪 Install tools for E2E tests
+        working-directory: ./E2ETesting-main
+        run: dotnet tool restore
 
       - name: 🗃️ Wait for Postgres
         run: |
@@ -52,16 +55,32 @@ jobs:
         env:
           PGPASSWORD: kiviksaif1941
 
-      - name: 🧪 Run Postman tests
+      - name: 🚀 Build and run backend
+        working-directory: ./WTP-main/server
         run: |
-          newman run Postman/WTP_CI_LoginFix.postman_collection.json             -e Postman/WTP.postman_environment.json             --insecure             --reporters cli,json             --reporter-json-export newman-results.json             --export-cookie-jar newman_cookies.json             --verbose
+          dotnet build server.csproj --configuration Release
+          dotnet run --project server.csproj --urls=http://localhost:5000 &
+          sleep 10
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+
+      - name: 📮 Run Postman tests
+        run: |
+          newman run Postman/WTP_CI_LoginFix.postman_collection.json \
+            -e Postman/WTP.postman_environment.json \
+            --insecure \
+            --reporters cli,json \
+            --reporter-json-export newman-results.json \
+            --export-cookie-jar newman_cookies.json \
+            --verbose
         shell: /usr/bin/bash -e {0}
         env:
           DOTNET_ROOT: /usr/share/dotnet
           ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
 
-      - name: 💻 Run Playwright/SpecFlow GUI tests
-        run: dotnet test E2ETesting-main
+      - name: 🎭 Run Playwright/SpecFlow GUI tests
+        working-directory: ./E2ETesting-main
+        run: dotnet test
 
   gui_tests:
     runs-on: ubuntu-latest
