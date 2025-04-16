@@ -64,19 +64,29 @@ jobs:
         env:
           ASPNETCORE_ENVIRONMENT: Development
 
-      - name: 📮 Run Postman tests
+      - name: 📮 Run Postman tests with HTML report
         run: |
-          newman run Postman/WTP_CI_LoginFix.postman_collection.json \
+          npm install -g newman newman-reporter-htmlextra
+          newman run Postman/WTP_CI_FinalFix.postman_collection.json \
             -e Postman/WTP.postman_environment.json \
             --insecure \
-            --reporters cli,json \
+            --reporters cli,json,htmlextra \
             --reporter-json-export newman-results.json \
+            --reporter-htmlextra-export newman-report.html \
             --export-cookie-jar newman_cookies.json \
             --verbose
         shell: /usr/bin/bash -e {0}
         env:
           DOTNET_ROOT: /usr/share/dotnet
           ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
+
+      - name: 💾 Upload Newman reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: newman-reports
+          path: |
+            newman-results.json
+            newman-report.html
 
       - name: 🎭 Run Playwright/SpecFlow GUI tests
         working-directory: ./E2ETesting-main
