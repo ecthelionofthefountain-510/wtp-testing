@@ -1,0 +1,93 @@
+name: 🧪 Run Postman and Playwright Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: kiviksaif1941
+          POSTGRES_DB: e2etests
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: ⬇️ Check out code
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: 🧱 Restore backend dependencies
+        working-directory: ./WTP-main/server
+        run: dotnet restore
+
+      - name: 🧪 Install tools for E2E tests
+        working-directory: ./E2ETesting-main
+        run: dotnet tool restore
+
+      - name: 🗃️ Wait for Postgres
+        run: |
+          until pg_isready -h localhost -p 5432; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
+      - name: ♻️ Reset and seed test database
+        run: |
+          psql -h localhost -U postgres -d e2etests -f Postman/db/e2etests_dump.sql
+          psql -h localhost -U postgres -d e2etests -f Postman/db/seed_admin.sql
+        env:
+          PGPASSWORD: kiviksaif1941
+
+      - name: 🚀 Build and run backend
+        working-directory: ./WTP-main/server
+        run: |
+          dotnet build server.csproj --configuration Release
+          dotnet run --project server.csproj --urls=http://localhost:5000 &
+          sleep 10
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+
+      - name: 📮 Run Postman tests with HTML report
+        run: |
+          npm install -g newman newman-reporter-htmlextra
+          newman run Postman/WTP_CI_FinalFix.postman_collection.json \
+            -e Postman/WTP.postman_environment.json \
+            --insecure \
+            --reporters cli,json,htmlextra \
+            --reporter-json-export newman-results.json \
+            --reporter-htmlextra-export newman-report.html \
+            --export-cookie-jar newman_cookies.json \
+            --verbose
+        shell: /usr/bin/bash -e {0}
+        env:
+          DOTNET_ROOT: /usr/share/dotnet
+          ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
+
+      - name: 💾 Upload Newman reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-reports
+          path: |
+            newman-results.json
+            newman-report.html
+
+      - name: 🎭 Run Playwright/SpecFlow GUI tests
+        working-directory: ./E2ETesting-main
+        run: dotnet test
