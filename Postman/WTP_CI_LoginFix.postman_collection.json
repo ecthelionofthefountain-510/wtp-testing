@@ -266,7 +266,12 @@
 									"  } else {",
 									"    console.log(\"Kunde inte sätta testUserId, user: \", JSON.stringify(jsonData.user));",
 									"  }",
-									"});"
+									"});",
+									"",
+									"let jsonData = pm.response.json();",
+									"let id = jsonData.user?.Id || jsonData.user?.id;",
+									"pm.environment.set(\"testUserId\", id);",
+									"console.log(\"testUserId satt till:\", id);"
 								],
 								"type": "text/javascript",
 								"packages": {}

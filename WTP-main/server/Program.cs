@@ -647,11 +647,15 @@ public class Program // Deklarerar huvudklassen Program
                 await using var cmd = db.CreateCommand(@"
                     SELECT ""Id"", first_name, company, role_id, email
                     FROM users
-                    WHERE (email = @login_id OR LOWER(TRIM(first_name)) = LOWER(TRIM(@login_id)))
+                    WHERE (LOWER(TRIM(email)) = LOWER(TRIM(@login_id)) OR LOWER(TRIM(first_name)) = LOWER(TRIM(@login_id)))
                     AND password = @password");
 
                 cmd.Parameters.AddWithValue("login_id", loginRequest.Username);
                 cmd.Parameters.AddWithValue("password", loginRequest.Password);
+                
+                Console.WriteLine($"[LOGIN DEBUG] Försöker logga in med:");
+                Console.WriteLine($"  login_id = '{loginRequest.Username}'");
+                Console.WriteLine($"  password = '{loginRequest.Password}'");
 
                 await using var reader = await cmd.ExecuteReaderAsync();
                 
@@ -680,6 +684,8 @@ public class Program // Deklarerar huvudklassen Program
                     context.Session.SetString("userCompany", company);
                     context.Session.SetString("userRole", roleName);
                     context.Session.SetString("userEmail", email);
+                    
+                    Console.WriteLine($"[LOGIN DEBUG] Query körs med: (email = {loginRequest.Username} OR first_name = {loginRequest.Username}), password = {loginRequest.Password}");
                     
                     Console.WriteLine($"Inloggning lyckades för användare: {firstName}, Roll: {roleName}, Företag: {company}");
                     
@@ -846,6 +852,7 @@ public class Program // Deklarerar huvudklassen Program
 
         app.Run(); // Startar webbservern
     }
+    
 
     public record GetTicketsDTO(
         string ChatToken,
@@ -857,3 +864,4 @@ public class Program // Deklarerar huvudklassen Program
         string Email,
         string FormType);
 }
+
