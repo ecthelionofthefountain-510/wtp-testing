@@ -67,14 +67,14 @@ jobs:
       - name: 📮 Run Postman tests with HTML report
         run: |
             npm install -g newman newman-reporter-htmlextra
-            newman run Postman/WTP_CI_LoginFix_Final.json \
-            -e Postman/WTP_environment.json \
+            newman run Postman/WTP_CI_LoginFix.postman_collection.json \
+            -e Postman/WTP.postman_environment.json \
             --insecure \
             --reporters cli,json,htmlextra \
             --reporter-json-export newman-results.json \
             --reporter-htmlextra-export newman-report.html \
             --export-cookie-jar newman_cookies.json \
-              --verbose
+            --verbose
         shell: /usr/bin/bash -e {0}
         env:
           DOTNET_ROOT: /usr/share/dotnet
