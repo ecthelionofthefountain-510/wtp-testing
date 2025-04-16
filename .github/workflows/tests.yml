@@ -27,7 +27,6 @@ jobs:
 
     env:
       DOTNET_ROOT: /usr/share/dotnet
-      DOTNET_RUNTIME_ID: linux-x64
       ConnectionStrings__DefaultConnection: Host=localhost;Port=5432;Database=e2etests;Username=postgres;Password=kiviksaif1941
 
     steps:
